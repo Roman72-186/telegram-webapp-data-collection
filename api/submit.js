@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
       return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
-    // Используем вебхук Leadteh напрямую
+    // Вебхук Leadteh
     const WEBHOOK_URL = 'https://rb257034.leadteh.ru/inner_webhook/fe02b6a2-14d6-46c3-836f-5fb8292d0e4f';
 
     let body = req.body;
@@ -19,41 +19,53 @@ module.exports = async (req, res) => {
 
     const telegram_id = body.telegram_id ?? null;
 
-    const firstName = String(body.firstName || '').trim();
-    const lastName  = String(body.lastName  || '').trim();
-    const phone     = String(body.phone     || '').trim();
+    // Валидация 7 числовых полей замеров
+    const measurementFields = ['weight', 'chest', 'navel', 'stomach', 'hips', 'legs', 'arms'];
+    const measurements = {};
+    const errors = [];
 
-    if (!firstName || !lastName) {
-      return res.status(400).json({ error: 'firstName and lastName are required' });
-    }
-    if (!/^\+7\d{10}$/.test(phone)) {
-      return res.status(400).json({ error: 'Invalid phone format. Expected +7XXXXXXXXXX' });
+    for (const field of measurementFields) {
+      const val = parseFloat(body[field]);
+      if (isNaN(val) || val <= 0) {
+        errors.push(`${field} must be a positive number`);
+      } else {
+        measurements[field] = val;
+      }
     }
 
-    // Подготовка данных в формате, требуемом LEADTEX
+    if (errors.length > 0) {
+      return res.status(400).json({ error: 'Validation failed', details: errors });
+    }
+
+    // Фото (опциональные, base64 строки)
+    const photo_1 = typeof body.photo_1 === 'string' && body.photo_1.length > 0 ? body.photo_1 : null;
+    const photo_2 = typeof body.photo_2 === 'string' && body.photo_2.length > 0 ? body.photo_2 : null;
+    const photo_3 = typeof body.photo_3 === 'string' && body.photo_3.length > 0 ? body.photo_3 : null;
+
+    // Подготовка данных для LEADTEX
     const payloadToLeadteh = {
       contact_by: 'telegram_id',
       search: String(telegram_id),
       variables: {
-        // Основная информация о пользователе
-        customer_name: `${firstName} ${lastName}`,
-        customer_phone: phone,
+        // Замеры тела
+        weight: measurements.weight,
+        chest: measurements.chest,
+        navel: measurements.navel,
+        stomach: measurements.stomach,
+        hips: measurements.hips,
+        legs: measurements.legs,
+        arms: measurements.arms,
 
-        // Информация из Telegram
-        telegram_user_name: firstName + ' ' + lastName,
+        // Фото (base64)
+        photo_1: photo_1,
+        photo_2: photo_2,
+        photo_3: photo_3,
+
+        // Системные поля
         telegram_id: telegram_id,
-
-        // Дополнительная информация
         source: 'telegram-webapp-data-collection',
         ts: new Date().toISOString(),
-
-        // Поля, которые могут использоваться в сценариях LEADTEX
-        first_name: firstName,
-        last_name: lastName,
-
-        // Поля для возможного расширения функционала
-        registration_date: new Date().toISOString().split('T')[0],
-        registration_source: 'telegram_mini_app'
+        submission_date: new Date().toISOString().split('T')[0]
       }
     };
 

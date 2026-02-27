@@ -15,11 +15,7 @@
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- IMask -->
-  <script src="https://cdn.jsdelivr.net/npm/imask@7.1.3/dist/imask.min.js"></script>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 
   <style>
     :root{
@@ -66,25 +62,6 @@
     .success-message{ display:none; }
     .success-message.show{ display:block; }
     html{ scroll-behavior:smooth; }
-    .checkbox-wrapper{
-      position:relative;
-      display:flex;
-      align-items:flex-start;
-      gap:.75rem;
-    }
-    .checkbox-wrapper input[type="checkbox"]{
-      width:1.25rem;
-      height:1.25rem;
-      margin-top:.125rem;
-      cursor:pointer;
-      accent-color:var(--tg-theme-button-color);
-    }
-    .checkbox-wrapper label{ cursor:pointer; line-height:1.5; }
-    .checkbox-wrapper a{
-      color:var(--tg-theme-link-color);
-      text-decoration:underline;
-    }
-    .checkbox-wrapper a:hover{ opacity:.8; }
 
     /* Ошибка отправки */
     .fatal-box{
@@ -98,6 +75,34 @@
       font-size:.95rem;
     }
     .fatal-box.show{ display:block; }
+
+    /* Превью фото */
+    .photo-preview{
+      width:100%;
+      max-width:200px;
+      border-radius:8px;
+      margin-top:8px;
+      display:none;
+    }
+    .photo-preview.show{
+      display:block;
+    }
+    .photo-upload-area{
+      border:2px dashed #e0e0e0;
+      border-radius:12px;
+      padding:16px;
+      text-align:center;
+      cursor:pointer;
+      transition:all .2s;
+    }
+    .photo-upload-area:hover{
+      border-color:var(--tg-theme-button-color);
+      background:rgba(51,144,236,.03);
+    }
+    .photo-upload-area.has-photo{
+      border-color:var(--tg-theme-button-color);
+      border-style:solid;
+    }
   </style>
 </head>
 
@@ -105,90 +110,118 @@
   <!-- Header -->
   <header class="bg-white shadow-sm py-6 px-4">
     <div class="max-w-2xl mx-auto">
-      <h1 class="text-3xl font-bold text-gray-900 text-center mb-2">Добро пожаловать!</h1>
-      <p class="text-gray-600 text-center">Заполните форму регистрации для доступа к нашему сервису</p>
+      <h1 class="text-3xl font-bold text-gray-900 text-center mb-2">Замеры тела</h1>
+      <p class="text-gray-600 text-center">Заполните ваши текущие замеры и загрузите фото прогресса</p>
     </div>
   </header>
 
   <!-- Main -->
   <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
     <!-- Form -->
-    <div id="registrationForm" class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+    <div id="dataForm" class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
       <form id="form" class="space-y-6" novalidate>
-        <!-- First Name -->
-        <div>
-          <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
-            Имя <span class="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
-            placeholder="Введите ваше имя"
-            autocomplete="given-name"
-          />
-          <div id="firstNameError" class="error-message"></div>
+
+        <!-- Замеры тела -->
+        <h2 class="text-lg font-semibold text-gray-800">Замеры <span class="text-red-500">*</span></h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Вес -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="weight" class="block text-sm font-medium text-gray-700 mb-2">Вес (кг)</label>
+            <input type="number" id="weight" name="weight" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
+              placeholder="70.5" />
+            <div id="weightError" class="error-message"></div>
+          </div>
+
+          <!-- Грудь -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="chest" class="block text-sm font-medium text-gray-700 mb-2">Грудь (см)</label>
+            <input type="number" id="chest" name="chest" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
+              placeholder="90" />
+            <div id="chestError" class="error-message"></div>
+          </div>
+
+          <!-- Пупок -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="navel" class="block text-sm font-medium text-gray-700 mb-2">Пупок (см)</label>
+            <input type="number" id="navel" name="navel" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
+              placeholder="80" />
+            <div id="navelError" class="error-message"></div>
+          </div>
+
+          <!-- Живот -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="stomach" class="block text-sm font-medium text-gray-700 mb-2">Живот (см)</label>
+            <input type="number" id="stomach" name="stomach" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
+              placeholder="85" />
+            <div id="stomachError" class="error-message"></div>
+          </div>
+
+          <!-- Бёдра -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="hips" class="block text-sm font-medium text-gray-700 mb-2">Бёдра (см)</label>
+            <input type="number" id="hips" name="hips" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
+              placeholder="95" />
+            <div id="hipsError" class="error-message"></div>
+          </div>
+
+          <!-- Ноги -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="legs" class="block text-sm font-medium text-gray-700 mb-2">Ноги (см)</label>
+            <input type="number" id="legs" name="legs" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
+              placeholder="55" />
+            <div id="legsError" class="error-message"></div>
+          </div>
+
+          <!-- Руки -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="arms" class="block text-sm font-medium text-gray-700 mb-2">Руки (см)</label>
+            <input type="number" id="arms" name="arms" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
+              placeholder="30" />
+            <div id="armsError" class="error-message"></div>
+          </div>
         </div>
 
-        <!-- Last Name -->
-        <div>
-          <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
-            Фамилия <span class="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
-            placeholder="Введите вашу фамилию"
-            autocomplete="family-name"
-          />
-          <div id="lastNameError" class="error-message"></div>
-        </div>
+        <!-- Фото -->
+        <h2 class="text-lg font-semibold text-gray-800 pt-4">Фото прогресса <span class="text-sm font-normal text-gray-500">(необязательно)</span></h2>
 
-        <!-- Phone -->
-        <div>
-          <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-            Номер телефона <span class="text-red-500">*</span>
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            class="tg-input w-full px-4 py-3 rounded-lg text-gray-900 placeholder-gray-400"
-            placeholder="+7 (999) 999-99-99"
-            autocomplete="tel"
-            inputmode="tel"
-          />
-          <div id="phoneError" class="error-message"></div>
-        </div>
-
-        <!-- Checkboxes -->
-        <div class="space-y-4 pt-2">
-          <div class="checkbox-wrapper">
-            <input type="checkbox" id="agreement1" name="agreement1" class="flex-shrink-0" />
-            <label for="agreement1" class="text-sm text-gray-700">
-              Я согласен с <a href="offer.html">Офертой</a>
-            </label>
+        <div class="space-y-4">
+          <!-- Фото 1 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Фото 1</label>
+            <div class="photo-upload-area" id="photoArea1" onclick="document.getElementById('photo1').click()">
+              <p class="text-gray-400 text-sm">Нажмите для загрузки фото</p>
+              <input type="file" id="photo1" accept="image/*" class="hidden" />
+            </div>
+            <img id="preview1" class="photo-preview" alt="Превью фото 1" />
           </div>
-          <div id="agreement1Error" class="error-message ml-7"></div>
 
-          <div class="checkbox-wrapper">
-            <input type="checkbox" id="agreement2" name="agreement2" class="flex-shrink-0" />
-            <label for="agreement2" class="text-sm text-gray-700">
-              Я согласен с <a href="privacy.html">Политикой конфиденциальности</a>
-            </label>
+          <!-- Фото 2 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Фото 2</label>
+            <div class="photo-upload-area" id="photoArea2" onclick="document.getElementById('photo2').click()">
+              <p class="text-gray-400 text-sm">Нажмите для загрузки фото</p>
+              <input type="file" id="photo2" accept="image/*" class="hidden" />
+            </div>
+            <img id="preview2" class="photo-preview" alt="Превью фото 2" />
           </div>
-          <div id="agreement2Error" class="error-message ml-7"></div>
 
-          <div class="checkbox-wrapper">
-            <input type="checkbox" id="agreement3" name="agreement3" class="flex-shrink-0" />
-            <label for="agreement3" class="text-sm text-gray-700">
-              Я согласен с <a href="data-processing.html">Обработкой персональных данных</a>
-            </label>
+          <!-- Фото 3 -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Фото 3</label>
+            <div class="photo-upload-area" id="photoArea3" onclick="document.getElementById('photo3').click()">
+              <p class="text-gray-400 text-sm">Нажмите для загрузки фото</p>
+              <input type="file" id="photo3" accept="image/*" class="hidden" />
+            </div>
+            <img id="preview3" class="photo-preview" alt="Превью фото 3" />
           </div>
-          <div id="agreement3Error" class="error-message ml-7"></div>
         </div>
 
         <!-- Submit -->
@@ -197,7 +230,7 @@
           id="submitBtn"
           class="tg-button w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 shadow-md hover:shadow-lg"
         >
-          Отправить
+          Отправить замеры
         </button>
 
         <!-- Loading -->
@@ -213,9 +246,9 @@
 
     <!-- Success -->
     <div id="successMessage" class="success-message bg-green-50 border border-green-200 rounded-2xl p-8 text-center mt-6">
-      <div class="text-green-600 text-5xl mb-4">✓</div>
+      <div class="text-green-600 text-5xl mb-4">&#10003;</div>
       <h2 class="text-2xl font-bold text-gray-900 mb-2">Спасибо!</h2>
-      <p class="text-gray-700 text-lg">Ваше согласие и данные успешно получены</p>
+      <p class="text-gray-700 text-lg">Ваши замеры успешно отправлены</p>
     </div>
   </main>
 
@@ -229,33 +262,21 @@
   <script>
     // ===== DOM =====
     const form = document.getElementById('form');
-    const registrationForm = document.getElementById('registrationForm');
+    const dataForm = document.getElementById('dataForm');
     const successMessage = document.getElementById('successMessage');
     const submitBtn = document.getElementById('submitBtn');
     const loadingIndicator = document.getElementById('loadingIndicator');
     const fatalBox = document.getElementById('fatalBox');
 
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput  = document.getElementById('lastName');
-    const phoneInput     = document.getElementById('phone');
+    // Поля замеров
+    const measurementFields = ['weight', 'chest', 'navel', 'stomach', 'hips', 'legs', 'arms'];
+    const measurementLabels = {
+      weight: 'Вес', chest: 'Грудь', navel: 'Пупок',
+      stomach: 'Живот', hips: 'Бёдра', legs: 'Ноги', arms: 'Руки'
+    };
 
-    const agreement1 = document.getElementById('agreement1');
-    const agreement2 = document.getElementById('agreement2');
-    const agreement3 = document.getElementById('agreement3');
-
-    const firstNameError = document.getElementById('firstNameError');
-    const lastNameError  = document.getElementById('lastNameError');
-    const phoneError     = document.getElementById('phoneError');
-
-    const agreement1Error = document.getElementById('agreement1Error');
-    const agreement2Error = document.getElementById('agreement2Error');
-    const agreement3Error = document.getElementById('agreement3Error');
-
-    // ===== Phone mask =====
-    const phoneMask = IMask(phoneInput, {
-      mask: '+{7} (000) 000-00-00',
-      lazy: false
-    });
+    // Хранилище сжатых фото (base64)
+    const compressedPhotos = { photo1: null, photo2: null, photo3: null };
 
     // ===== Helpers =====
     function showFatal(message) {
@@ -276,98 +297,130 @@
       errorEl.textContent = '';
     }
 
-    function validateFirstName() {
-      const v = (firstNameInput.value || '').trim();
-      if (!v) { showError(firstNameInput, firstNameError, 'Поле "Имя" обязательно для заполнения'); return false; }
-      if (v.length < 2) { showError(firstNameInput, firstNameError, 'Имя должно содержать минимум 2 символа'); return false; }
-      hideError(firstNameInput, firstNameError);
+    // ===== Валидация замеров =====
+    function validateMeasurement(fieldId) {
+      const input = document.getElementById(fieldId);
+      const errorEl = document.getElementById(fieldId + 'Error');
+      const label = measurementLabels[fieldId];
+      const val = parseFloat(input.value);
+
+      if (!input.value.trim()) {
+        showError(input, errorEl, `Поле "${label}" обязательно для заполнения`);
+        return false;
+      }
+      if (isNaN(val) || val <= 0) {
+        showError(input, errorEl, `Введите корректное значение для "${label}"`);
+        return false;
+      }
+      hideError(input, errorEl);
       return true;
     }
 
-    function validateLastName() {
-      const v = (lastNameInput.value || '').trim();
-      if (!v) { showError(lastNameInput, lastNameError, 'Поле "Фамилия" обязательно для заполнения'); return false; }
-      if (v.length < 2) { showError(lastNameInput, lastNameError, 'Фамилия должна содержать минимум 2 символа'); return false; }
-      hideError(lastNameInput, lastNameError);
-      return true;
-    }
-
-    function validatePhone() {
-      // Для маски +{7} (...) unmaskedValue содержит цифры вместе с 7 (обычно 11)
-      const digits = (phoneMask.unmaskedValue || '').replace(/\D/g,'');
-      // Приводим к +7XXXXXXXXXX (10 цифр после 7)
-      const isOk = /^7\d{10}$/.test(digits);
-      if (!isOk) { showError(phoneInput, phoneError, 'Введите корректный номер телефона'); return false; }
-      hideError(phoneInput, phoneError);
-      return true;
-    }
-
-    function validateCheckboxes() {
-      let ok = true;
-
-      if (!agreement1.checked) { agreement1Error.textContent = 'Необходимо согласие с Офертой'; ok = false; }
-      else agreement1Error.textContent = '';
-
-      if (!agreement2.checked) { agreement2Error.textContent = 'Необходимо согласие с Политикой конфиденциальности'; ok = false; }
-      else agreement2Error.textContent = '';
-
-      if (!agreement3.checked) { agreement3Error.textContent = 'Необходимо согласие с Обработкой персональных данных'; ok = false; }
-      else agreement3Error.textContent = '';
-
-      return ok;
-    }
-
-    function buildPhoneE164() {
-      const digits = (phoneMask.unmaskedValue || '').replace(/\D/g,''); // 7XXXXXXXXXX
-      if (!/^7\d{10}$/.test(digits)) return null;
-      return `+${digits}`; // +7XXXXXXXXXX
+    function validateAllMeasurements() {
+      let allOk = true;
+      for (const field of measurementFields) {
+        if (!validateMeasurement(field)) allOk = false;
+      }
+      return allOk;
     }
 
     // ===== Real-time validation =====
-    firstNameInput.addEventListener('blur', validateFirstName);
-    lastNameInput.addEventListener('blur', validateLastName);
-    phoneInput.addEventListener('blur', validatePhone);
+    for (const field of measurementFields) {
+      document.getElementById(field).addEventListener('blur', () => validateMeasurement(field));
+    }
 
-    agreement1.addEventListener('change', () => { if (agreement1.checked) agreement1Error.textContent = ''; });
-    agreement2.addEventListener('change', () => { if (agreement2.checked) agreement2Error.textContent = ''; });
-    agreement3.addEventListener('change', () => { if (agreement3.checked) agreement3Error.textContent = ''; });
+    // ===== Сжатие фото =====
+    function compressImage(file, maxSize, quality) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let w = img.width;
+            let h = img.height;
+
+            // Уменьшаем до maxSize по большей стороне
+            if (w > maxSize || h > maxSize) {
+              if (w > h) {
+                h = Math.round(h * maxSize / w);
+                w = maxSize;
+              } else {
+                w = Math.round(w * maxSize / h);
+                h = maxSize;
+              }
+            }
+
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+
+            // JPEG с указанным quality
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            resolve(dataUrl);
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ===== Обработка загрузки фото =====
+    function setupPhotoInput(inputId, previewId, areaId, storageKey) {
+      const input = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+      const area = document.getElementById(areaId);
+
+      input.addEventListener('change', async function() {
+        const file = this.files[0];
+        if (!file) return;
+
+        // Сжимаем: max 800px, quality 0.6
+        const compressed = await compressImage(file, 800, 0.6);
+        compressedPhotos[storageKey] = compressed;
+
+        // Показываем превью
+        preview.src = compressed;
+        preview.classList.add('show');
+        area.classList.add('has-photo');
+        area.querySelector('p').textContent = file.name;
+      });
+    }
+
+    setupPhotoInput('photo1', 'preview1', 'photoArea1', 'photo1');
+    setupPhotoInput('photo2', 'preview2', 'photoArea2', 'photo2');
+    setupPhotoInput('photo3', 'preview3', 'photoArea3', 'photo3');
 
     // ===== Submit =====
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       hideFatal();
 
-      // Валидация (одним проходом)
-      const ok =
-        (validateFirstName() ? 1 : 0) &
-        (validateLastName()  ? 1 : 0) &
-        (validatePhone()     ? 1 : 0) &
-        (validateCheckboxes()? 1 : 0);
+      if (!validateAllMeasurements()) return;
 
-      if (!ok) return;
-
-      const phoneE164 = buildPhoneE164();
-      if (!phoneE164) {
-        showError(phoneInput, phoneError, 'Введите корректный номер телефона');
-        return;
-      }
-
-      // Telegram context (если открыто из Telegram)
+      // Telegram context
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
       const initData = tg ? (tg.initData || '') : '';
       const initDataUnsafe = tg ? (tg.initDataUnsafe || {}) : {};
 
-      // В режиме разработки можно использовать тестовые данные
       const telegram_id =
         tg && initDataUnsafe.user && typeof initDataUnsafe.user.id === 'number'
           ? initDataUnsafe.user.id
-          : (window.DEV_TELEGRAM_ID || null); // Для тестирования без Telegram
+          : (window.DEV_TELEGRAM_ID || null);
+
+      // Собираем замеры
+      const measurements = {};
+      for (const field of measurementFields) {
+        measurements[field] = parseFloat(document.getElementById(field).value);
+      }
 
       const payload = {
-        firstName: (firstNameInput.value || '').trim(),
-        lastName: (lastNameInput.value || '').trim(),
-        phone: phoneE164,
+        ...measurements,
+        photo_1: compressedPhotos.photo1 || null,
+        photo_2: compressedPhotos.photo2 || null,
+        photo_3: compressedPhotos.photo3 || null,
         telegram_id,
         telegram: {
           initData,
@@ -375,11 +428,11 @@
         }
       };
 
-      if (window.Telegram && window.Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
+      if (tg) {
+        tg.ready();
+        tg.expand();
       }
-          
+
       submitBtn.disabled = true;
       loadingIndicator.classList.remove('hidden');
 
@@ -395,7 +448,7 @@
           throw new Error(t || `HTTP ${res.status}`);
         }
 
-        registrationForm.classList.add('hidden');
+        dataForm.classList.add('hidden');
         successMessage.classList.add('show');
 
         if (tg) { try { tg.close(); } catch (_) {} }
@@ -406,7 +459,6 @@
         loadingIndicator.classList.add('hidden');
       }
     });
-
 
     // Telegram init
     if (window.Telegram && window.Telegram.WebApp) {

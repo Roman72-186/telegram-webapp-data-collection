@@ -1,6 +1,6 @@
 # Интеграция «Сбор данных» Mini App с LEADTEX
 
-Инструкция по получению Telegram ID пользователя и отправке данных в LEADTEX.
+Инструкция по получению Telegram ID пользователя и отправке замеров тела в LEADTEX.
 
 ---
 
@@ -39,15 +39,20 @@ const payloadToLeadteh = {
     contact_by: 'telegram_id',
     search: String(telegram_id),
     variables: {
-        customer_name: 'Иван Петров',
-        customer_phone: '+79991234567',
-        telegram_user_name: 'Иван Петров',
+        weight: 70.5,
+        chest: 90,
+        navel: 80,
+        stomach: 85,
+        hips: 95,
+        legs: 55,
+        arms: 30,
+        photo_1: 'data:image/jpeg;base64,...',
+        photo_2: null,
+        photo_3: null,
         telegram_id: 123456789,
         source: 'telegram-webapp-data-collection',
-        first_name: 'Иван',
-        last_name: 'Петров',
-        registration_date: '2026-02-28',
-        registration_source: 'telegram_mini_app'
+        ts: '2026-02-28T12:00:00.000Z',
+        submission_date: '2026-02-28'
     }
 };
 ```
@@ -77,7 +82,7 @@ const payloadToLeadteh = {
 ```
 Триггер: Inner Webhook (fe02b6a2-14d6-46c3-836f-5fb8292d0e4f)
     ↓
-Действие: Обновить переменные контакта
+Действие: Обновить переменные контакта (замеры и фото)
     ↓
 Действие: Отправить уведомление / тег / сообщение
 ```
@@ -96,14 +101,16 @@ const payloadToLeadteh = {
 ┌───────────────────────────────────────────────────────┐
 │  2. Mini App (index.html)                             │
 │     - Получает telegram_id                            │
-│     - Пользователь заполняет форму                    │
+│     - Пользователь заполняет замеры тела              │
+│     - Опционально загружает фото (сжатие на клиенте)  │
 │     - POST на /api/submit                             │
 └───────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌───────────────────────────────────────────────────────┐
 │  3. Vercel Serverless Function (api/submit.js)        │
-│     - Валидирует данные                               │
+│     - Валидирует 7 числовых полей замеров             │
+│     - Принимает опциональные фото (base64)            │
 │     - Перенаправляет на LEADTEX webhook               │
 └───────────────────────────────────────────────────────┘
                           │
@@ -111,7 +118,7 @@ const payloadToLeadteh = {
 ┌───────────────────────────────────────────────────────┐
 │  4. LEADTEX (rb257034.leadteh.ru)                     │
 │     - Ищет контакт по telegram_id                     │
-│     - Записывает переменные в карточку                │
+│     - Записывает замеры и фото в карточку             │
 │     - Запускает сценарий                              │
 └───────────────────────────────────────────────────────┘
 ```
@@ -122,15 +129,19 @@ const payloadToLeadteh = {
 
 | Переменная | Описание | Пример |
 |------------|----------|--------|
-| `{{customer_name}}` | Имя и фамилия | Иван Петров |
-| `{{customer_phone}}` | Телефон | +79991234567 |
-| `{{telegram_user_name}}` | Имя из Telegram | Иван Петров |
+| `{{weight}}` | Вес (кг) | 70.5 |
+| `{{chest}}` | Грудь (см) | 90 |
+| `{{navel}}` | Пупок (см) | 80 |
+| `{{stomach}}` | Живот (см) | 85 |
+| `{{hips}}` | Бёдра (см) | 95 |
+| `{{legs}}` | Ноги (см) | 55 |
+| `{{arms}}` | Руки (см) | 30 |
+| `{{photo_1}}` | Фото 1 | base64 JPEG или null |
+| `{{photo_2}}` | Фото 2 | base64 JPEG или null |
+| `{{photo_3}}` | Фото 3 | base64 JPEG или null |
 | `{{telegram_id}}` | Telegram ID | 123456789 |
-| `{{first_name}}` | Имя | Иван |
-| `{{last_name}}` | Фамилия | Петров |
 | `{{source}}` | Источник | telegram-webapp-data-collection |
-| `{{registration_date}}` | Дата | 2026-02-28 |
-| `{{registration_source}}` | Источник регистрации | telegram_mini_app |
+| `{{submission_date}}` | Дата отправки | 2026-02-28 |
 | `{{ts}}` | Timestamp | ISO 8601 |
 
 ---
@@ -148,5 +159,5 @@ console.log(Telegram.WebApp.initDataUnsafe.user);
 ```bash
 curl -X POST https://YOUR-VERCEL-URL/api/submit \
   -H "Content-Type: application/json" \
-  -d '{"firstName":"Тест","lastName":"Тестов","phone":"+79991234567","telegram_id":123456789}'
+  -d '{"weight":70.5,"chest":90,"navel":80,"stomach":85,"hips":95,"legs":55,"arms":30,"telegram_id":123456789}'
 ```
