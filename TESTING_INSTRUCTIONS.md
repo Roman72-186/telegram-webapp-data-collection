@@ -28,7 +28,7 @@
 2. Найдите контакт по telegram_id
 3. Проверьте переменные:
    - weight, chest, navel, stomach, hips, legs, arms
-   - photo_1, photo_2, photo_3 (если загружались)
+   - photo_1, photo_2, photo_3 (URL из Cloudinary, если загружались)
    - telegram_id
    - source (должно быть `telegram-webapp-data-collection`)
    - submission_date
@@ -46,7 +46,15 @@
 1. Нажмите на область загрузки фото
 2. Выберите изображение
 3. Проверьте, что превью отображается
-4. Проверьте в Network tab, что base64 строка присутствует в payload
+4. Отправьте форму и проверьте в Network tab ответ от API
+5. В payload к Leadteh переменные photo_1/2/3 должны содержать URL вида `https://res.cloudinary.com/...`
+
+## Проверка Cloudinary
+
+1. Убедитесь, что в Vercel заданы env-переменные `CLOUDINARY_CLOUD_NAME` и `CLOUDINARY_UPLOAD_PRESET`
+2. Отправьте форму с фото
+3. Откройте Cloudinary Dashboard → Media Library — загруженные фото должны появиться
+4. В Leadteh переменные photo_1/2/3 содержат короткие URL-ссылки (не base64)
 
 ## Возможные ошибки и решения
 

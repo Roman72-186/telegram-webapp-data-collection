@@ -12,6 +12,7 @@
 - 7 числовых полей замеров тела с валидацией
 - 3 опциональных поля загрузки фото с превью
 - Сжатие фото на клиенте (canvas → JPEG, max 800px, quality 0.6)
+- Загрузка фото в Cloudinary на сервере, передача URL в Leadteh
 - Отправка данных в Leadteh с идентификацией по telegram_id
 - Адаптивный дизайн
 
@@ -45,7 +46,7 @@
     "hips": 95,
     "legs": 55,
     "arms": 30,
-    "photo_1": "data:image/jpeg;base64,...",
+    "photo_1": "https://res.cloudinary.com/your-cloud/image/upload/v123/abc.jpg",
     "photo_2": null,
     "photo_3": null,
     "telegram_id": "telegram_id_пользователя",
@@ -64,6 +65,15 @@
 ## Деплой
 
 Проект готов для деплоя на Vercel. Каждый пуш в ветку main запускает автодеплой.
+
+### Environment Variables (Vercel)
+
+Для загрузки фото в Cloudinary необходимо добавить в Vercel → Settings → Environment Variables:
+
+| Переменная | Описание |
+|-----------|----------|
+| `CLOUDINARY_CLOUD_NAME` | Имя облака из Cloudinary Dashboard |
+| `CLOUDINARY_UPLOAD_PRESET` | Unsigned upload preset (создать в Settings → Upload) |
 
 ## Ссылки
 

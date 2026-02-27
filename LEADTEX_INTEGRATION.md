@@ -46,7 +46,7 @@ const payloadToLeadteh = {
         hips: 95,
         legs: 55,
         arms: 30,
-        photo_1: 'data:image/jpeg;base64,...',
+        photo_1: 'https://res.cloudinary.com/your-cloud/image/upload/v123/abc.jpg',
         photo_2: null,
         photo_3: null,
         telegram_id: 123456789,
@@ -110,8 +110,8 @@ const payloadToLeadteh = {
 ┌───────────────────────────────────────────────────────┐
 │  3. Vercel Serverless Function (api/submit.js)        │
 │     - Валидирует 7 числовых полей замеров             │
-│     - Принимает опциональные фото (base64)            │
-│     - Перенаправляет на LEADTEX webhook               │
+│     - Загружает фото в Cloudinary → получает URL      │
+│     - Перенаправляет данные (с URL фото) в LEADTEX    │
 └───────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -136,9 +136,9 @@ const payloadToLeadteh = {
 | `{{hips}}` | Бёдра (см) | 95 |
 | `{{legs}}` | Ноги (см) | 55 |
 | `{{arms}}` | Руки (см) | 30 |
-| `{{photo_1}}` | Фото 1 | base64 JPEG или null |
-| `{{photo_2}}` | Фото 2 | base64 JPEG или null |
-| `{{photo_3}}` | Фото 3 | base64 JPEG или null |
+| `{{photo_1}}` | Фото 1 | URL Cloudinary или null |
+| `{{photo_2}}` | Фото 2 | URL Cloudinary или null |
+| `{{photo_3}}` | Фото 3 | URL Cloudinary или null |
 | `{{telegram_id}}` | Telegram ID | 123456789 |
 | `{{source}}` | Источник | telegram-webapp-data-collection |
 | `{{submission_date}}` | Дата отправки | 2026-02-28 |
