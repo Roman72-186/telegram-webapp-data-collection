@@ -1,0 +1,375 @@
+<!-- measurements.html — Замеры без фото -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+
+  <!-- Telegram Meta Tags -->
+  <meta name="telegram-web-app" content="true" />
+  <meta name="theme-color" content="#faf7f2" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+  <title>Замеры тела - Telegram Web App</title>
+
+  <!-- Google Fonts: Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root{
+      --tg-theme-bg-color:#faf7f2;
+      --tg-theme-text-color:#3d2e1e;
+      --tg-theme-hint-color:#6b5740;
+      --tg-theme-link-color:#c5a55a;
+      --tg-theme-button-color:#c5a55a;
+      --tg-theme-button-text-color:#ffffff;
+      --tg-theme-secondary-bg-color:#f5efe6;
+      --gold-primary:#c5a55a;
+      --gold-dark:#b8943e;
+      --gold-light:#e0c97a;
+      --text-dark:#3d2e1e;
+      --text-label:#6b5740;
+      --border-color:#e0d5c5;
+      --error-color:#d4453a;
+    }
+    html{ scroll-behavior:smooth; }
+    body{
+      font-family:'Montserrat',sans-serif;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(197,165,90,.07) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(224,201,122,.09) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(184,148,62,.05) 0%, transparent 50%),
+        radial-gradient(circle at 30% 10%, rgba(255,255,250,.6) 0%, transparent 40%),
+        radial-gradient(circle at 70% 90%, rgba(245,239,230,.8) 0%, transparent 40%),
+        linear-gradient(135deg, #faf7f2 0%, #f5efe6 30%, #faf7f2 50%, #f0e8da 70%, #faf7f2 100%);
+      color:var(--text-dark);
+      min-height:100vh;
+    }
+    .tg-button{
+      background:linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+      color:#fff;
+      cursor:pointer;
+      pointer-events:auto;
+      box-shadow:0 4px 14px rgba(197,165,90,.35);
+      transition:all .3s ease;
+    }
+    .tg-button:hover{
+      box-shadow:0 6px 20px rgba(197,165,90,.5);
+      transform:translateY(-1px);
+    }
+    .tg-button:disabled{
+      opacity:.5;
+      cursor:not-allowed;
+      transform:none;
+    }
+    .tg-input{
+      border:1px solid var(--border-color);
+      background:rgba(255,255,252,.7);
+      transition:all .2s;
+      color:var(--text-dark);
+    }
+    .tg-input:focus{
+      border-color:var(--gold-primary);
+      outline:none;
+      box-shadow:0 0 0 3px rgba(197,165,90,.15);
+    }
+    .tg-input::placeholder{ color:#b8a890; }
+    .tg-input.error{ border-color:var(--error-color); }
+    .error-message{
+      color:var(--error-color);
+      font-size:.875rem;
+      margin-top:.25rem;
+      min-height:1.1em;
+    }
+    .success-message{ display:none; }
+    .success-message.show{ display:block; }
+
+    /* Карточка формы — glassmorphism */
+    .form-card{
+      background:rgba(255,255,252,.92);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      border:1px solid rgba(224,213,197,.5);
+    }
+
+    /* Ошибка отправки */
+    .fatal-box{
+      display:none;
+      border:1px solid var(--error-color);
+      background:#fff5f5;
+      border-radius:12px;
+      padding:12px 14px;
+      margin-top:14px;
+      color:#b30000;
+      font-size:.95rem;
+    }
+    .fatal-box.show{ display:block; }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="py-6 px-4" style="background:transparent;">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-3xl font-bold text-center mb-2" style="color:var(--text-dark);">Замеры тела</h1>
+      <p class="text-center" style="color:var(--text-label);">Заполните ваши текущие замеры</p>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-8">
+    <!-- Form -->
+    <div id="dataForm" class="form-card rounded-2xl shadow-lg p-6 md:p-8">
+      <form id="form" class="space-y-6" novalidate>
+
+        <!-- Замеры тела -->
+        <h2 class="text-lg font-semibold" style="color:var(--text-dark);">Замеры <span style="color:var(--error-color);">*</span></h2>
+
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Вес -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="weight" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Вес (кг)</label>
+            <input type="number" id="weight" name="weight" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="70.5" />
+            <div id="weightError" class="error-message"></div>
+          </div>
+
+          <!-- Грудь -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="chest" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Грудь (см)</label>
+            <input type="number" id="chest" name="chest" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="90" />
+            <div id="chestError" class="error-message"></div>
+          </div>
+
+          <!-- Пупок -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="navel" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Пупок (см)</label>
+            <input type="number" id="navel" name="navel" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="80" />
+            <div id="navelError" class="error-message"></div>
+          </div>
+
+          <!-- Живот -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="stomach" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Живот (см)</label>
+            <input type="number" id="stomach" name="stomach" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="85" />
+            <div id="stomachError" class="error-message"></div>
+          </div>
+
+          <!-- Бёдра -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="hips" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Бёдра (см)</label>
+            <input type="number" id="hips" name="hips" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="95" />
+            <div id="hipsError" class="error-message"></div>
+          </div>
+
+          <!-- Ноги -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="legs" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Ноги (см)</label>
+            <input type="number" id="legs" name="legs" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="55" />
+            <div id="legsError" class="error-message"></div>
+          </div>
+
+          <!-- Руки -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="arms" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Руки (см)</label>
+            <input type="number" id="arms" name="arms" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="30" />
+            <div id="armsError" class="error-message"></div>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          id="submitBtn"
+          class="tg-button w-full py-4 px-6 rounded-full font-semibold text-lg transition-all duration-200"
+        >
+          Отправить замеры
+        </button>
+
+        <!-- Loading -->
+        <div id="loadingIndicator" class="hidden text-center py-4">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2" style="border-color:var(--gold-primary);"></div>
+          <p class="mt-2" style="color:var(--text-label);">Отправка данных...</p>
+        </div>
+
+        <!-- Fatal -->
+        <div id="fatalBox" class="fatal-box"></div>
+      </form>
+    </div>
+
+    <!-- Success -->
+    <div id="successMessage" class="success-message form-card rounded-2xl p-8 text-center mt-6" style="border:1px solid var(--border-color);">
+      <div class="text-5xl mb-4" style="color:var(--gold-primary);">&#10003;</div>
+      <h2 class="text-2xl font-bold mb-2" style="color:var(--text-dark);">Спасибо!</h2>
+      <p class="text-lg" style="color:var(--text-label);">Ваши замеры успешно отправлены</p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="mt-auto" style="background:transparent;">
+    <div class="max-w-4xl mx-auto px-4 py-6 text-center text-sm" style="color:var(--text-label);">
+      <p>&copy; 2025 Все права защищены</p>
+    </div>
+  </footer>
+
+  <script>
+    // ===== DOM =====
+    const form = document.getElementById('form');
+    const dataForm = document.getElementById('dataForm');
+    const successMessage = document.getElementById('successMessage');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const fatalBox = document.getElementById('fatalBox');
+
+    // Поля замеров
+    const measurementFields = ['weight', 'chest', 'navel', 'stomach', 'hips', 'legs', 'arms'];
+    const measurementLabels = {
+      weight: 'Вес', chest: 'Грудь', navel: 'Пупок',
+      stomach: 'Живот', hips: 'Бёдра', legs: 'Ноги', arms: 'Руки'
+    };
+
+    // ===== Helpers =====
+    function showFatal(message) {
+      fatalBox.textContent = message || 'Ошибка';
+      fatalBox.classList.add('show');
+    }
+    function hideFatal() {
+      fatalBox.textContent = '';
+      fatalBox.classList.remove('show');
+    }
+
+    function showError(input, errorEl, message) {
+      input.classList.add('error');
+      errorEl.textContent = message || '';
+    }
+    function hideError(input, errorEl) {
+      input.classList.remove('error');
+      errorEl.textContent = '';
+    }
+
+    // ===== Валидация замеров =====
+    function validateMeasurement(fieldId) {
+      const input = document.getElementById(fieldId);
+      const errorEl = document.getElementById(fieldId + 'Error');
+      const label = measurementLabels[fieldId];
+      const val = parseFloat(input.value);
+
+      if (!input.value.trim()) {
+        showError(input, errorEl, `Поле "${label}" обязательно для заполнения`);
+        return false;
+      }
+      if (isNaN(val) || val <= 0) {
+        showError(input, errorEl, `Введите корректное значение для "${label}"`);
+        return false;
+      }
+      hideError(input, errorEl);
+      return true;
+    }
+
+    function validateAllMeasurements() {
+      let allOk = true;
+      for (const field of measurementFields) {
+        if (!validateMeasurement(field)) allOk = false;
+      }
+      return allOk;
+    }
+
+    // ===== Real-time validation =====
+    for (const field of measurementFields) {
+      document.getElementById(field).addEventListener('blur', () => validateMeasurement(field));
+    }
+
+    // ===== Submit =====
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideFatal();
+
+      if (!validateAllMeasurements()) return;
+
+      // Telegram context
+      const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+      const initData = tg ? (tg.initData || '') : '';
+      const initDataUnsafe = tg ? (tg.initDataUnsafe || {}) : {};
+
+      const telegram_id =
+        tg && initDataUnsafe.user && typeof initDataUnsafe.user.id === 'number'
+          ? initDataUnsafe.user.id
+          : (window.DEV_TELEGRAM_ID || null);
+
+      // Собираем замеры
+      const measurements = {};
+      for (const field of measurementFields) {
+        measurements[field] = parseFloat(document.getElementById(field).value);
+      }
+
+      const payload = {
+        ...measurements,
+        telegram_id,
+        telegram: {
+          initData,
+          user: initDataUnsafe.user || null
+        }
+      };
+
+      if (tg) {
+        tg.ready();
+        tg.expand();
+      }
+
+      submitBtn.disabled = true;
+      loadingIndicator.classList.remove('hidden');
+
+      try {
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const t = await res.text().catch(() => '');
+          throw new Error(t || `HTTP ${res.status}`);
+        }
+
+        dataForm.classList.add('hidden');
+        successMessage.classList.add('show');
+
+        if (tg) { try { tg.close(); } catch (_) {} }
+      } catch (err) {
+        showFatal(`Произошла ошибка при отправке данных: ${err && err.message ? err.message : 'неизвестная ошибка'}`);
+      } finally {
+        submitBtn.disabled = false;
+        loadingIndicator.classList.add('hidden');
+      }
+    });
+
+    // Telegram init
+    if (window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+    }
+  </script>
+</body>
+</html>
