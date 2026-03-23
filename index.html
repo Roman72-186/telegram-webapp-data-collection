@@ -165,7 +165,7 @@
           <!-- Вес -->
           <div class="col-span-2 sm:col-span-1">
             <label for="weight" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Вес (кг)</label>
-            <input type="number" id="weight" name="weight" step="0.1" inputmode="decimal"
+            <input type="text" id="weight" name="weight"
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="70.5" />
             <div id="weightError" class="error-message"></div>
@@ -174,7 +174,7 @@
           <!-- Грудь -->
           <div class="col-span-2 sm:col-span-1">
             <label for="chest" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват груди (см)</label>
-            <input type="number" id="chest" name="chest" step="0.1" inputmode="decimal"
+            <input type="text" id="chest" name="chest"
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="90" />
             <div id="chestError" class="error-message"></div>
@@ -183,7 +183,7 @@
           <!-- Пупок -->
           <div class="col-span-2 sm:col-span-1">
             <label for="navel" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват по пупку (см)</label>
-            <input type="number" id="navel" name="navel" step="0.1" inputmode="decimal"
+            <input type="text" id="navel" name="navel"
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="80" />
             <div id="navelError" class="error-message"></div>
@@ -192,7 +192,7 @@
           <!-- Живот -->
           <div class="col-span-2 sm:col-span-1">
             <label for="stomach" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват живота/талии (см)</label>
-            <input type="number" id="stomach" name="stomach" step="0.1" inputmode="decimal"
+            <input type="text" id="stomach" name="stomach"
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="85" />
             <div id="stomachError" class="error-message"></div>
@@ -201,7 +201,7 @@
           <!-- Бёдра -->
           <div class="col-span-2 sm:col-span-1">
             <label for="hips" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват бёдер (см)</label>
-            <input type="number" id="hips" name="hips" step="0.1" inputmode="decimal"
+            <input type="text" id="hips" name="hips"
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="95" />
             <div id="hipsError" class="error-message"></div>
@@ -210,7 +210,7 @@
           <!-- Ноги -->
           <div class="col-span-2 sm:col-span-1">
             <label for="legs" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват квадрицепс (см)</label>
-            <input type="number" id="legs" name="legs" step="0.1" inputmode="decimal"
+            <input type="text" id="legs" name="legs"
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="55" />
             <div id="legsError" class="error-message"></div>
@@ -219,7 +219,7 @@
           <!-- Руки -->
           <div class="col-span-2 sm:col-span-1">
             <label for="arms" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват бицепс (см)</label>
-            <input type="number" id="arms" name="arms" step="0.1" inputmode="decimal"
+            <input type="text" id="arms" name="arms"
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="30" />
             <div id="armsError" class="error-message"></div>
@@ -357,8 +357,8 @@
         showError(input, errorEl, `Поле "${label}" обязательно для заполнения`);
         return false;
       }
-      if (isNaN(val) || val <= 0) {
-        showError(input, errorEl, `Введите корректное значение для "${label}"`);
+      if (!input.value.trim()) {
+        showError(input, errorEl, `Поле "${label}" обязательно для заполнения`);
         return false;
       }
       hideError(input, errorEl);
@@ -462,7 +462,7 @@
       // Собираем замеры
       const measurements = {};
       for (const field of measurementFields) {
-        measurements[field] = parseFloat(document.getElementById(field).value);
+        measurements[field] = document.getElementById(field).value.trim();
       }
 
       const payload = {
