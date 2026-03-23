@@ -55,9 +55,9 @@ module.exports = async (req, res) => {
     const errors = [];
 
     for (const field of measurementFields) {
-      const val = parseFloat(body[field]);
-      if (isNaN(val) || val <= 0) {
-        errors.push(`${field} must be a positive number`);
+      const val = body[field];
+      if (typeof val !== 'string' || val.trim() === '') {
+        errors.push(`${field} must be a non-empty string`);
       } else {
         measurements[field] = val;
       }
