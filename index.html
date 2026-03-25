@@ -227,7 +227,7 @@
         </div>
 
         <!-- Фото -->
-        <h2 class="text-lg font-semibold pt-4" style="color:var(--text-dark);">Фото прогресса <span class="text-sm font-normal" style="color:var(--text-label);">(необязательно)</span></h2>
+        <h2 class="text-lg font-semibold pt-4" style="color:var(--text-dark);">Фото прогресса <span style="color:var(--error-color);">*</span></h2>
 
         <div class="space-y-4">
           <!-- Фото 1 -->
@@ -236,6 +236,7 @@
             <div class="photo-upload-area" id="photoArea1" onclick="document.getElementById('photo1').click()">
               <p class="text-sm" style="color:#b8a890;">Нажмите для загрузки фото</p>
               <input type="file" id="photo1" accept="image/*" class="hidden" />
+              <div id="photo1Error" class="error-message"></div>
             </div>
             <img id="preview1" class="photo-preview" alt="Превью фото 1" />
             <div class="mt-2 text-xs" style="color:var(--text-label);">
@@ -250,6 +251,7 @@
             <div class="photo-upload-area" id="photoArea2" onclick="document.getElementById('photo2').click()">
               <p class="text-sm" style="color:#b8a890;">Нажмите для загрузки фото</p>
               <input type="file" id="photo2" accept="image/*" class="hidden" />
+              <div id="photo2Error" class="error-message"></div>
             </div>
             <img id="preview2" class="photo-preview" alt="Превью фото 2" />
             <div class="mt-2 text-xs" style="color:var(--text-label);">
@@ -264,6 +266,7 @@
             <div class="photo-upload-area" id="photoArea3" onclick="document.getElementById('photo3').click()">
               <p class="text-sm" style="color:#b8a890;">Нажмите для загрузки фото</p>
               <input type="file" id="photo3" accept="image/*" class="hidden" />
+              <div id="photo3Error" class="error-message"></div>
             </div>
             <img id="preview3" class="photo-preview" alt="Превью фото 3" />
             <div class="mt-2 text-xs" style="color:var(--text-label);">
@@ -450,7 +453,28 @@
       e.preventDefault();
       hideFatal();
 
+      // Валидация замеров
       if (!validateAllMeasurements()) return;
+
+      // Валидация фотографий
+      let photosValid = true;
+      const photoErrors = {
+        photo1: document.getElementById('photo1Error'),
+        photo2: document.getElementById('photo2Error'),
+        photo3: document.getElementById('photo3Error')
+      };
+
+      // Проверяем наличие всех трех фотографий
+      for (const [key, errorEl] of Object.entries(photoErrors)) {
+        if (!compressedPhotos[key]) {
+          errorEl.textContent = 'Загрузите фотографию';
+          photosValid = false;
+        } else {
+          errorEl.textContent = '';
+        }
+      }
+
+      if (!photosValid) return;
 
       // Telegram context
       const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;

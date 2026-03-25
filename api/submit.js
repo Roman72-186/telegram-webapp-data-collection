@@ -67,24 +67,30 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Validation failed', details: errors });
     }
 
-    // Фото (опциональные, base64 строки) → загрузка в Cloudinary → URL
+    // Фото (обязательные, base64 строки) → загрузка в Cloudinary → URL
     const photoFields = ['photo_1', 'photo_2', 'photo_3'];
     const photoUrls = {};
 
+    // Проверяем наличие всех фотографий
     for (const field of photoFields) {
       const raw = body[field];
-      if (typeof raw === 'string' && raw.length > 0) {
-        try {
-          photoUrls[field] = await uploadToCloudinary(raw);
-        } catch (err) {
-          return res.status(502).json({
-            error: `Failed to upload ${field} to Cloudinary`,
-            message: err.message,
-          });
-        }
-      } else {
-        photoUrls[field] = null;
+      if (typeof raw !== 'string' || raw.length === 0) {
+        errors.push(`${field} is required`);
+        continue;
       }
+
+      try {
+        photoUrls[field] = await uploadToCloudinary(raw);
+      } catch (err) {
+        return res.status(502).json({
+          error: `Failed to upload ${field} to Cloudinary`,
+          message: err.message,
+        });
+      }
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({ error: 'Validation failed', details: errors });
     }
 
     // Подготовка данных для LEADTEX
