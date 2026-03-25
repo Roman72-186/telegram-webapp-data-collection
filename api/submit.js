@@ -50,7 +50,7 @@ module.exports = async (req, res) => {
     const telegram_id = body.telegram_id ?? null;
 
     // Валидация 7 числовых полей замеров
-    const measurementFields = ['weight', 'chest', 'navel', 'stomach', 'hips', 'legs', 'arms'];
+    const measurementFields = ['weight', 'chest', 'stomach', 'navel', 'hips', 'arms', 'legs'];
     const measurements = {};
     const errors = [];
 

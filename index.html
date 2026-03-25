@@ -180,15 +180,6 @@
             <div id="chestError" class="error-message"></div>
           </div>
 
-          <!-- Пупок -->
-          <div class="col-span-2 sm:col-span-1">
-            <label for="navel" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват по пупку (см)</label>
-            <input type="number" id="navel" name="navel" step="0.1" inputmode="decimal"
-              class="tg-input w-full px-4 py-3 rounded-lg"
-              placeholder="80" />
-            <div id="navelError" class="error-message"></div>
-          </div>
-
           <!-- Живот -->
           <div class="col-span-2 sm:col-span-1">
             <label for="stomach" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват живота/талии (см)</label>
@@ -196,6 +187,15 @@
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="85" />
             <div id="stomachError" class="error-message"></div>
+          </div>
+
+          <!-- Пупок -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="navel" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват по пупку (см)</label>
+            <input type="number" id="navel" name="navel" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="80" />
+            <div id="navelError" class="error-message"></div>
           </div>
 
           <!-- Бёдра -->
@@ -207,15 +207,6 @@
             <div id="hipsError" class="error-message"></div>
           </div>
 
-          <!-- Ноги -->
-          <div class="col-span-2 sm:col-span-1">
-            <label for="legs" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват квадрицепс (см)</label>
-            <input type="number" id="legs" name="legs" step="0.1" inputmode="decimal"
-              class="tg-input w-full px-4 py-3 rounded-lg"
-              placeholder="55" />
-            <div id="legsError" class="error-message"></div>
-          </div>
-
           <!-- Руки -->
           <div class="col-span-2 sm:col-span-1">
             <label for="arms" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват бицепс (см)</label>
@@ -223,6 +214,15 @@
               class="tg-input w-full px-4 py-3 rounded-lg"
               placeholder="30" />
             <div id="armsError" class="error-message"></div>
+          </div>
+
+          <!-- Ноги -->
+          <div class="col-span-2 sm:col-span-1">
+            <label for="legs" class="block text-sm font-medium mb-2" style="color:var(--text-label);">Обхват квадрицепс (см)</label>
+            <input type="number" id="legs" name="legs" step="0.1" inputmode="decimal"
+              class="tg-input w-full px-4 py-3 rounded-lg"
+              placeholder="55" />
+            <div id="legsError" class="error-message"></div>
           </div>
         </div>
 
@@ -321,7 +321,7 @@
     const fatalBox = document.getElementById('fatalBox');
 
     // Поля замеров
-    const measurementFields = ['weight', 'chest', 'navel', 'stomach', 'hips', 'legs', 'arms'];
+    const measurementFields = ['weight', 'chest', 'stomach', 'navel', 'hips', 'arms', 'legs'];
     const measurementLabels = {
       weight: 'Вес', chest: 'Обхват груди', navel: 'Обхват по пупку',
       stomach: 'Обхват живота/талии', hips: 'Обхват бёдер', legs: 'Обхват квадрицепс', arms: 'Обхват бицепс'
